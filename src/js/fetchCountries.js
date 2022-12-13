@@ -1,11 +1,15 @@
-import {countyInfo, markupList} from '../index'
+import { countyInfo, markupList } from '../index'
+import Notiflix from 'notiflix';
 
 const countryList = document.querySelector('.country-list');
 const countryDiv = document.querySelector('.country-info');
 
 function fetchCountries(name) {
     return fetch(`https://restcountries.com/v2/name/${name}?fields=name,capital,population,flags,languages`)
-        .then(response => {   
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.status);
+            }
             return response.json();
         })
         .then(counrty => {
@@ -13,7 +17,7 @@ function fetchCountries(name) {
                 console.log(counrty.length);
                 countryDiv.innerHTML = '';
                 countryList.innerHTML = '';
-                console.log("Too many matches found. Please enter a more specific name.");
+                Notiflix.Notify.warning("Too many matches found. Please enter a more specific name.");
             }
             if (counrty.length >= 2 && counrty.length <= 10) {
                 console.log(counrty.length);
@@ -27,6 +31,9 @@ function fetchCountries(name) {
                 countryList.innerHTML = '';
             }   
         })
+        .catch(error => {
+            Notiflix.Notify.failure('Oops, there is no country with that name');
+        })  
 }
 
 export {fetchCountries};
